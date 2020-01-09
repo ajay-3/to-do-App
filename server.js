@@ -12,6 +12,8 @@ app.get("/",(req,res)=>{
     res.json("Hi there welcome to app");
 })
 app.post('/addtodo',(req,res)=>{
+    console.log("A addtoDo request has been request remotely");
+    console.log(req.body);
      var newTask = req.body.text;
      tasks.push(newTask);
      let data = {
@@ -29,7 +31,10 @@ app.post('/addtodo',(req,res)=>{
 });
 
 app.post('/marktodo', (req,res)=>{
+    console.log("this is before sending response");
      res.sendStatus(200);
+    console.log("A marktodo request has been request remotely");
+    console.log(req.body);
      var deletetask = req.body.text;
      if(indexof(deletetask)){
         tasks.splice(indexof(deletetask),1);
@@ -61,6 +66,7 @@ app.post('/marktodo', (req,res)=>{
 });
 
 app.get('/listtodos',(req,res)=> {
+  console.log("the list has been called remotely");
   if(tasks.length){
     var string = tasks.toString().split(",").join("  ");
     let data={
