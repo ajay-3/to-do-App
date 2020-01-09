@@ -12,7 +12,6 @@ app.get("/",(req,res)=>{
     res.json("Hi there welcome to app");
 })
 app.post('/addtodo',(req,res)=>{
-     res.sendStatus(200);
      var newTask = req.body.text;
      tasks.push(newTask);
      let data = {
@@ -63,14 +62,14 @@ app.post('/marktodo', (req,res)=>{
 
 app.get('/listtodos',(req,res)=> {
   if(tasks.length){
-    var string = tasks.toString().split(",").join(" ");
+    var string = tasks.toString().split(",").join("  ");
     let data={
      "blocks":[
          {
              "type" : "section",
              "fields" : [{
                  "type" : "plain_text",
-                 "text" : string
+                 "text" : string 
              }]
          }
         ]
