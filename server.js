@@ -25,17 +25,23 @@ function responseServer(text){
            };
 }
 app.get("/",(req,res)=>{
-    res.json("Hi there welcome to To-DO app");
+    res.json("Hi welcome to To-DO application");
 })
 app.post('/addtodo',(req,res)=>{
     var channel_id=req.body.channel_id;
     var newTask = req.body.text;
+    var result;
     if(tasks[channel_id]){
-        tasks[channel_id].push(newTask);
+        if(tasks[channel_id].indexOf(newTask)>=0){
+            result = responseServer("Task " + newTask + "Already exists");
+        }else{
+            tasks[channel_id].push(newTask);
+            result = responseServer("ADDED TODO for \" "  + newTask + "\"");
+        }
     }else{
         tasks[channel_id] = [newTask];
+        result = responseServer("ADDED TODO for \" "  + newTask + "\"");
     }
-    var result = responseServer("ADDED TODO for \" "  + newTask + "\"");
     res.json(result);
 });
 
@@ -59,9 +65,16 @@ app.post('/marktodo', (req,res)=>{
 
 app.get('/listtodos', (req,res)=> {
      var channel_id=req.query.channel_id;
+     var result;
      if(tasks[channel_id]){
-         console.log(tasks[channel_id])
-      res.json({"text":tasks[channel_id].length>0?tasks[channel_id].join("\n"):"NO TODOS"});
+         if(tasks[channel_id].length>0){
+            var string = tasks[channel_id].join("/n");
+            result = responseServer(string);
+            res.json(result);
+         }else{
+            result= responseServer("NO TODOS");
+            res.json(result);
+         }      
     }else{
         result= responseServer("NO TODOS");
         res.json(result);
