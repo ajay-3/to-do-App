@@ -1,107 +1,71 @@
 var express = require('express');
 var bodyParser = require("body-parser");
 var tasks = require('./Data/todo');
+var cors = require('cors');
 
 var app = express();
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.set('port',(process.env.PORT||3000));
+app.set('port',(process.env.PORT||80));
 
+
+function responseServer(text){
+    return {
+        "blocks":[
+            {
+                "type" : "section",
+                "fields" : [{
+                    "type" : "plain_text",
+                    "text" : text
+                }]
+            }
+           ]
+           };
+}
 app.get("/",(req,res)=>{
-    res.json("Hi there welcome to app");
+    res.json("Hi there welcome to To-DO app");
 })
 app.post('/addtodo',(req,res)=>{
-    res.json({"text":"200"});
-    // // console.log("A addtoDo request has been request remotely");
-    // // console.log(req.body);
-    //  var newTask = req.body.text;
-    //  tasks.push(newTask);
-    //  let data = {
-    //     "blocks": [
-    //         {
-    //             "type": "section",
-	// 		    "fields":[{
-    //                     "type": "plain_text",
-    //                     "text": "ADDED TODO for \" "  + req.body.text + "\""
-    //                 }
-    //             ]
-    //         }
-    //     ]};
-    //  res.json(data);
+    var channel_id=req.body.channel_id;
+    var newTask = req.body.text;
+    if(tasks[channel_id]){
+        tasks[channel_id].push(newTask);
+    }else{
+        tasks[channel_id] = [newTask];
+    }
+    var result = responseServer("ADDED TODO for \" "  + newTask + "\"");
+    res.json(result);
 });
 
 app.post('/marktodo', (req,res)=>{
-    console.log("this is before sending response");
-    console.log("A marktodo request has been request remotely");
-    res.sendStatus(200);
-    console.log(req.body);
      var deletetask = req.body.text;
-     if(indexof(deletetask)){
-        tasks.splice(indexof(deletetask),1);
-        let data = {
-            "blocks": [
-                {
-                    "type": "section",
-                    "fields":[{
-                            "type": "plain_text",
-                            "text": "Removed TODO for \" "  + req.body.text + "\""
-                        }]
-                }
-            ]};
-        res.json(data)
+     var result;
+     var channel_id=req.body.channel_id;
+     if(tasks[channel_id]){
+      if(tasks[channel_id].indexOf(deletetask)>=0){
+        tasks[channel_id].splice(tasks[channel_id].indexOf(deletetask),1);
+        result= responseServer("Removed TODO for \" "  + deletetask + "\"");
+        res.json(result);
      }else{
-        let data={
-            "blocks":[
-                {
-                    "type" : "section",
-                    "fields" : [{
-                        "type" : "plain_text",
-                        "text" : "Please enter proper To-do item"
-                    }]
-                }
-            ]
-        }
-        res.json(data)
+        result = responseServer("No such task found to delete") ;
+        res.json(result);
+     }}else{
+        result= responseServer("No such task found to delete");
+        res.json(result);
      }
 });
 
-app.get('/listtodos',async (req,res)=> {
-    try{ 
-    console.log("the list has been called remotely");
-    if(tasks.length){
-      var string = tasks.join("\n");
-      let data={
-       "blocks":[
-           {
-               "type" : "section",
-               "fields" : [{
-                   "type" : "plain_text",
-                   "text" : {
-                       "type":"mrkdwn",
-                        "text":string
-                      } 
-               }]
-           }
-          ]
-          }
-          res.json(data);
-         }else{
-          let data={
-              "blocks":[
-                  {
-                      "type" : "section",
-                      "fields" : [{
-                          "type" : "plain_text",
-                          "text" : "NO TODOS"
-                      }]
-                  }
-                 ]};
-                res.json(data);
-          }}catch(error){
-              res.json({"text":error});
-          };
-    }
+app.get('/listtodos', (req,res)=> {
+     var channel_id=req.query.channel_id;
+     if(tasks[channel_id]){
+         console.log(tasks[channel_id])
+      res.json({"text":tasks[channel_id].length>0?tasks[channel_id].join("\n"):"NO TODOS"});
+    }else{
+        result= responseServer("NO TODOS");
+        res.json(result);
+    }}
    );
 
 app.listen(app.get('port'), ()=> {

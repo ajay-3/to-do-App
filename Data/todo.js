@@ -1,3 +1,3 @@
-var tasks = [];
+var tasks = {};
 
 module.exports = tasks;
