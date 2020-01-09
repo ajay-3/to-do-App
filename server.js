@@ -33,14 +33,14 @@ app.post('/addtodo',(req,res)=>{
     var result;
     if(tasks[channel_id]){
         if(tasks[channel_id].indexOf(newTask)>=0){
-            result = responseServer("Task " + newTask + "Already exists");
+            result = responseServer("Task " +newTask + "Already exists");
         }else{
             tasks[channel_id].push(newTask);
-            result = responseServer("ADDED TODO for \" "  + newTask + "\"");
+            result = responseServer("ADDED TODO for \" "  +newTask + "\"");
         }
     }else{
         tasks[channel_id] = [newTask];
-        result = responseServer("ADDED TODO for \" "  + newTask + "\"");
+        result = responseServer("ADDED TODO for \" "  +newTask + "\"");
     }
     res.json(result);
 });
@@ -52,7 +52,7 @@ app.post('/marktodo', (req,res)=>{
      if(tasks[channel_id]){
       if(tasks[channel_id].indexOf(deletetask)>=0){
         tasks[channel_id].splice(tasks[channel_id].indexOf(deletetask),1);
-        result= responseServer("Removed TODO for \" "  + deletetask + "\"");
+        result= responseServer("Removed TODO for \" "  +deletetask + "\"");
         res.json(result);
      }else{
         result = responseServer("No such task found to delete") ;
@@ -68,7 +68,7 @@ app.get('/listtodos', (req,res)=> {
      var result;
      if(tasks[channel_id]){
          if(tasks[channel_id].length>0){
-            var string = tasks[channel_id].join("/n");
+            var string = tasks[channel_id].join("\n");
             result = responseServer(string);
             res.json(result);
          }else{
